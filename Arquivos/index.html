@@ -4,45 +4,60 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Xadrez</title>
+
+    <style>
+        body, html
+        {
+            margin: 0;
+            height: 100%;
+            width: 100%;
+        }
+        body
+        {
+            background-color: whitesmoke;
+            align-content: center;
+        }
+    </style>
 </head>
 <body>
-    <div id='tabuleiro'></div>
+    <div id='board'></div>
 
     <script>
-        let tabuleiro = document.getElementById('tabuleiro')
+        let board = document.getElementById('board')
 
-        criaTabuleiro()
-        
+        generateBoard()
 
-        function criaTabuleiro()
+
+        function generateBoard()
         {
-            let branco, row
+            let white, row
             let tileSize = Math.floor(window.innerHeight / 8) + 'px'
 
             for(let i = 0; i < 8; i++)
             {
-                branco = i % 2 === 0 ? true : false
+                white = i % 2 === 0
 
                 row = document.createElement('div')
 
                 row.setAttribute('id', i)
                 row.style.display = 'flex'
-
-                tabuleiro.appendChild(row)
+                row.style.justifyContent = 'center'
 
                 for(let j = 0; j < 8; j++)
                 {
-                    let col = document.createElement('div')
+                    let tile = document.createElement('div')
 
-                    col.style.height = tileSize
-                    col.style.width = tileSize
-                    col.style.backgroundColor = branco ? '#fff' : '#000'
+                    tile.style.height = tileSize
+                    tile.style.width = tileSize
+                    tile.style.backgroundColor = white ? '#fff' : '#000'
 
-                    col.setAttribute('id', j)
-                    row.appendChild(col)
+                    tile.setAttribute('id', j)
+                    row.appendChild(tile)
 
-                    branco = !branco
+                    white = !white
                 }
+
+                board.appendChild(row)
             }
         }
     </script>
