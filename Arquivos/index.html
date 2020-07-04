@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xadrez</title>
+</head>
+<body>
+    <div id='tabuleiro'></div>
+
+    <script>
+        let tabuleiro = document.getElementById('tabuleiro')
+
+        criaTabuleiro()
+        
+
+        function criaTabuleiro()
+        {
+            let branco, row
+            let tileSize = Math.floor(window.innerHeight / 8) + 'px'
+
+            for(let i = 0; i < 8; i++)
+            {
+                branco = i % 2 === 0 ? true : false
+
+                row = document.createElement('div')
+
+                row.setAttribute('id', i)
+                row.style.display = 'flex'
+
+                tabuleiro.appendChild(row)
+
+                for(let j = 0; j < 8; j++)
+                {
+                    let col = document.createElement('div')
+
+                    col.style.height = tileSize
+                    col.style.width = tileSize
+                    col.style.backgroundColor = branco ? '#fff' : '#000'
+
+                    col.setAttribute('id', j)
+                    row.appendChild(col)
+
+                    branco = !branco
+                }
+            }
+        }
+    </script>
+</body>
+</html>
