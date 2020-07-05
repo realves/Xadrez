@@ -1,8 +1,8 @@
-var canvas, render, pieces_img, heart
+let canvas, render, pieces_img
 /*var w_king, w_queen, b_king, b_queen
 var w_bishops, w_knights, w_rooks, w_pawns
 var b_bishops, b_knights, b_rooks, b_pawns*/
-var w_king = { x: 320, y: 540, img_x: 0, img_y: 0 }
+let w_king = { x: 320, y: 540, img_x: 0, img_y: 0 }
 
 const fps = 1000/30
 
@@ -47,7 +47,7 @@ function drawBoard()
 
 function drawPieces()
 {
-    render.drawImage(pieces_img, 0, 0)
+    render.drawImage(pieces_img, w_king.img_x, w_king.img_y, 200, 200, w_king.x, w_king.y, 80, 80)
 }
 
 /*var king = function(white, x, y)
