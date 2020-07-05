@@ -1,8 +1,5 @@
 let canvas, render, pieces_img
-/*var w_king, w_queen, b_king, b_queen
-var w_bishops, w_knights, w_rooks, w_pawns
-var b_bishops, b_knights, b_rooks, b_pawns*/
-let w_king = { x: 320, y: 540, img_x: 0, img_y: 0 }
+let whites = [], blacks = []
 
 const fps = 1000/30
 
@@ -17,13 +14,20 @@ window.onload = function()
     pieces_img = new Image()
     pieces_img.src = "img/pieces.png"
 
-    pieces_img.onload = initGame()
+    pieces_img.onload = initGame
 }
 
 function initGame()
 {
+    clearBoard()
     drawBoard()
+    createPieces()
     drawPieces()
+}
+
+function clearBoard()
+{
+    render.clearRect(0, 0, canvas.width, canvas.height)
 }
 
 function drawBoard()
@@ -45,47 +49,53 @@ function drawBoard()
     }
 }
 
-function drawPieces()
+function createPieces()
 {
-    render.drawImage(pieces_img, w_king.img_x, w_king.img_y, 200, 200, w_king.x, w_king.y, 80, 80)
+    //cria as pecas brancas
+    whites.push({ name: "king", x: 320, y: 560, img_x: 0, img_y: 0 })
+    whites.push({ name: "queen", x: 240, y: 560, img_x: 200, img_y: 0})
+    whites.push
+    (
+        { name: "knight", x: 80, y: 560, img_x: 600, img_y: 0 },
+        { name: "knight", x: 480, y: 560, img_x: 600, img_y: 0 }
+    )
+    whites.push
+    (
+        { name: "bishop", x: 160, y: 560, img_x: 400, img_y: 0 },
+        { name: "bishop", x: 400, y: 560, img_x: 400, img_y: 0 }
+    )
+    whites.push
+    (
+        { name: "rooks", x: 0, y: 560, img_x: 800, img_y: 0 },
+        { name: "rooks", x: 560, y: 560, img_x: 800, img_y: 0 }
+    )
+    for(let i = 0; i < 8; i++)
+        whites.push({ name: "pawn", x: i * 80, y: 480, img_x: 1000, img_y: 0 })
+
+    //cria as pecas pretas
+    blacks.push({ name: "king", x: 320, y: 0, img_x: 0, img_y: 200 })
+    blacks.push({ name: "queen", x: 240, y: 0, img_x: 200, img_y: 200})
+    blacks.push
+    (
+        { name: "knight", x: 80, y: 0, img_x: 600, img_y: 200 },
+        { name: "knight", x: 480, y: 0, img_x: 600, img_y: 200 }
+    )
+    blacks.push
+    (
+        { name: "bishop", x: 160, y: 0, img_x: 400, img_y: 200 },
+        { name: "bishop", x: 400, y: 0, img_x: 400, img_y: 200 }
+    )
+    blacks.push
+    (
+        { name: "rooks", x: 0, y: 0, img_x: 800, img_y: 200 },
+        { name: "rooks", x: 560, y: 0, img_x: 800, img_y: 200 }
+    )
+    for(let i = 0; i < 8; i++)
+        blacks.push({ name: "pawn", x: i * 80, y: 80, img_x: 1000, img_y: 200 })
 }
 
-/*var king = function(white, x, y)
+function drawPieces(piece)
 {
-    let img_x = 0
-    let img_y = white ? 0 : 200
-    let pos_x = x
-    let pos_y = y
+    whites.forEach( piece => render.drawImage(pieces_img, piece.img_x, piece.img_y, 200, 200, piece.x, piece.y, 80, 80))
+    blacks.forEach( piece => render.drawImage(pieces_img, piece.img_x, piece.img_y, 200, 200, piece.x, piece.y, 80, 80))
 }
-
-var queen = function(white, x, y)
-{
-    let img_x = 200
-    let img_y = white ? 0 : 200
-    let pos_x = x
-    let pos_y = y
-}
-
-var bishop = function(white)
-{
-    let img_x = 400
-    let img_y = white ? 0 : 200
-}
-
-var knight = function(white)
-{
-    let img_x = 600
-    let img_y = white ? 0 : 200
-}
-
-var rook = function(white)
-{
-    let img_x = 800
-    let img_y = white ? 0 : 200
-}
-
-var pawn = function(white)
-{
-    let img_x = 1000
-    let img_y = white ? 0 : 200
-}*/
