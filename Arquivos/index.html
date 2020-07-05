@@ -1,65 +1,33 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
+    <title>Xadrez</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Xadrez</title>
+    
 
     <style>
         body, html
         {
             margin: 0;
             height: 100%;
-            width: 100%;
         }
         body
         {
-            background-color: whitesmoke;
-            align-content: center;
+            background-color: #291f1a;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+        canvas
+        {
+            border-style: solid;
+            border-color: #0a0a0a;
         }
     </style>
 </head>
 <body>
-    <div id='board'></div>
-
-    <script>
-        let board = document.getElementById('board')
-
-        generateBoard()
-
-
-        function generateBoard()
-        {
-            let white, row
-            let tileSize = Math.floor(window.innerHeight / 8) + 'px'
-
-            for(let i = 0; i < 8; i++)
-            {
-                white = i % 2 === 0
-
-                row = document.createElement('div')
-
-                row.setAttribute('id', i)
-                row.style.display = 'flex'
-                row.style.justifyContent = 'center'
-
-                for(let j = 0; j < 8; j++)
-                {
-                    let tile = document.createElement('div')
-
-                    tile.style.height = tileSize
-                    tile.style.width = tileSize
-                    tile.style.backgroundColor = white ? '#fff' : '#000'
-
-                    tile.setAttribute('id', j)
-                    row.appendChild(tile)
-
-                    white = !white
-                }
-
-                board.appendChild(row)
-            }
-        }
-    </script>
+    <canvas id="mycanvas"></canvas>
+    <script src="scripts/main.js" type="text/javascript"></script>
 </body>
 </html>
