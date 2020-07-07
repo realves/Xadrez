@@ -1,6 +1,21 @@
-let canvas, render, pieces_img, board, tileSize, selected
-let whites = [], blacks = []
-//let piece = { name: "", xPos: 0, yPos: 0, xImg: 0, yImg: 0, alive: false }
+let canvas, render, pieces_img, tileSize, board = [], selected = []
+
+let pieces = 
+[
+    { name: "w_queen", xImg: 200, yImg: 0, movement: queenMovement },
+    { name: "w_king", xImg: 0, yImg: 0, movement: kingMovement },
+    { name: "w_bishop", xImg: 400, yImg: 0, movement: bishopMovement },
+    { name: "w_knight", xImg: 600, yImg: 0, movement: knightMovement },
+    { name: "w_rook", xImg: 800, yImg: 0, movement: rookMovement },
+    { name: "w_pawn", xImg: 1000, yImg: 0, movement: pawnMovement },
+
+    { name: "b_queen", xImg: 200, yImg: 200, movement: queenMovement },
+    { name: "b_king", xImg: 0, yImg: 200, movement: kingMovement },
+    { name: "b_bishop", xImg: 400, yImg: 200, movement: bishopMovement },
+    { name: "b_knight", xImg: 600, yImg: 200, movement: knightMovement },
+    { name: "b_rook", xImg: 800, yImg: 200, movement: rookMovement },
+    { name: "b_pawn", xImg: 1000, yImg: 200, movement: pawnMovement },
+]
 
 const fps = 1000/30
 
@@ -22,23 +37,37 @@ window.onload = function()
 
 function initGame()
 {
-    selected = null
-
-    clearBoard()
-    drawBoard()
+    selected.length = 0
+    
     createPieces()
-    drawPieces()
-    addEventListener("mouseup", mouse_click)
+    drawBoard()
+    addEventListener("mouseup", function(event)
+    {
+        let mouseX = event.clientX - canvas.offsetLeft
+        let mouseY = event.clientY - canvas.offsetTop
+        if(mouseX > 0 && mouseX < canvas.width && mouseY > 0 && mouseY < canvas.height) movePiece(mouseX, mouseY)
+    })
 }
 
 //configuracao do tabuleiro
-function clearBoard()
+function createPieces()
 {
-    render.clearRect(0, 0, canvas.width, canvas.height)
+    for(let i = 0; i < 8; i++) board[i] = new Array(7)
+
+    for(let i = 0; i < 8; i++)
+    {
+        board[i][7] = (i < 3) ? (4 - i) : (i - 3)
+        board[i][0] = (i < 3) ? (10 - i) : (i + 3)
+
+        board[i][6] = 5
+        board[i][1] = 11
+    }
 }
 
 function drawBoard()
 {
+    render.clearRect(0, 0, canvas.width, canvas.height)
+
     let white
     
     for(let i = 0; i < 8; i++)
@@ -53,94 +82,92 @@ function drawBoard()
             white = !white
         }
     }
-}
 
-function createPieces()
-{
-    //cria as pecas brancas
-    whites.push({ name: "king", x: 4, y: 7, img_x: 0, img_y: 0 })
-    whites.push({ name: "queen", x: 3, y: 7, img_x: 200, img_y: 0 })
-    whites.push
-    (
-        { name: "knight", x: 1, y: 7, img_x: 600, img_y: 0 },
-        { name: "knight", x: 6, y: 7, img_x: 600, img_y: 0 }
-    )
-    whites.push
-    (
-        { name: "bishop", x: 2, y: 7, img_x: 400, img_y: 0 },
-        { name: "bishop", x: 5, y: 7, img_x: 400, img_y: 0 }
-    )
-    whites.push
-    (
-        { name: "rooks", x: 0, y: 7, img_x: 800, img_y: 0 },
-        { name: "rooks", x: 7, y: 7, img_x: 800, img_y: 0 }
-    )
-    for(let i = 0; i < 8; i++)
-        whites.push({ name: "pawn", x: i, y: 6, img_x: 1000, img_y: 0 })
-
-    //cria as pecas pretas
-    blacks.push({ name: "king", x: 4, y: 0, img_x: 0, img_y: 200 })
-    blacks.push({ name: "queen", x: 3, y: 0, img_x: 200, img_y: 200 })
-    blacks.push
-    (
-        { name: "knight", x: 1, y: 0, img_x: 600, img_y: 200 },
-        { name: "knight", x: 6, y: 0, img_x: 600, img_y: 200 }
-    )
-    blacks.push
-    (
-        { name: "bishop", x: 2, y: 0, img_x: 400, img_y: 200 },
-        { name: "bishop", x: 5, y: 0, img_x: 400, img_y: 200 }
-    )
-    blacks.push
-    (
-        { name: "rooks", x: 0, y: 0, img_x: 800, img_y: 200 },
-        { name: "rooks", x: 7, y: 0, img_x: 800, img_y: 200 }
-    )
-    for(let i = 0; i < 8; i++)
-        blacks.push({ name: "pawn", x: i, y: 1, img_x: 1000, img_y: 200 })
+    drawPieces()
 }
 
 function drawPieces()
 {
-    whites.forEach( piece => render.drawImage(pieces_img, piece.img_x, piece.img_y, 200, 200, piece.x * 80, piece.y * 80, 80, 80))
-    blacks.forEach( piece => render.drawImage(pieces_img, piece.img_x, piece.img_y, 200, 200, piece.x * 80, piece.y * 80, 80, 80))
+    for(let i = 0; i < 8; i++)
+    {
+        for(let j = 0; j < 8; j++)
+        {
+            if(board[i][j] !== undefined)
+            {
+                render.drawImage
+                (
+                    pieces_img, pieces[ board[i][j] ].xImg, pieces[ board[i][j] ].yImg, 200, 200,
+                    i * tileSize, j * tileSize, tileSize, tileSize
+                )
+            }
+        }
+    }
 }
 
 //input do jogador
-function mouse_click(info)
+function movePiece(mouseX, mouseY)
 {
-    if(selected === null) selected = tileContent(Math.floor(info.offsetX / 80), Math.floor(info.offsetY / 80))
-
-    else moveSelected(selected, Math.floor(info.offsetX / 80), Math.floor(info.offsetY / 80))
-}
-
-function tileContent(x, y)
-{
-    for(let i = 0; i < 16; i++)
+    if(selected.length === 0)
     {
-        if(whites[i].x === x && whites[i].y === y) return i
+        let x = Math.floor(mouseX / tileSize)
+        let y = Math.floor(mouseY / tileSize)
+    
+        if(board[x][y] !== undefined) selected = [x, y]
     }
+    
+    else
+    {
+        let x = Math.floor(mouseX / tileSize)
+        let y = Math.floor(mouseY / tileSize)
+    
+        if(board[x][y] === undefined)
+        {
+            board[x][y] = board[ selected[0] ][ selected[1] ]
+            board[ selected[0] ][ selected[1] ] = undefined
+            drawBoard()
+        }
 
-    return null
+        selected.length = 0
+    }
 }
 
-function moveSelected(index, x, y)
+function kingMovement(index)
 {
-    for(let i = 0; i < 16; i++)
+    let tiles = {}
+
+    for(let i = 0; i < 3; i++)
     {
-        if(whites[i].x === x && whites[i].y === y)
+        for(let j = 0; j < 3; j++)
         {
-            selected = null
-            return
+            //if()
         }
     }
+}
 
-    whites[index].x = x
-    whites[index].y = y
+function queenMovement(index)
+{
 
-    clearBoard()
-    drawBoard()
-    drawPieces()
+}
 
-    selected = null
+function bishopMovement(index)
+{
+
+}
+
+function knightMovement(index)
+{
+    console.log(
+        whites[index].x + 1, whites[index].y - 2,
+        whites[index].x - 1, whites[index].y - 2
+    )
+}
+
+function rookMovement(index)
+{
+
+}
+
+function pawnMovement(index)
+{
+    console.log(whites[index].x, whites[index].y -1)
 }
