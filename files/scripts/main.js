@@ -1,4 +1,4 @@
-let canvas, render, pieces_img, tileSize, board = [], selected = []
+let canvas, render, pieces_img, tileSize, board, selected = []
 
 let pieces = 
 [
@@ -37,9 +37,10 @@ window.onload = function()
 
 function initGame()
 {
+    //garante que nenhuma peca esteja selecionada no comeco da partida
     selected.length = 0
     
-    createPieces()
+    configBoard()
     drawBoard()
     addEventListener("mouseup", function(event)
     {
@@ -50,15 +51,22 @@ function initGame()
 }
 
 //configuracao do tabuleiro
-function createPieces()
+function configBoard()
 {
-    for(let i = 0; i < 8; i++) board[i] = new Array(7)
+    //cria as linhas e colunas do tabuleiro
+    board = []
+    for(let i = 0; i < 8; i++) board[i] = new Array(8)
 
+    //board armazena um numero entre 0 e 11 que determina
+    //o tipo da peca que esta contida na posicao (x, y)
+    //com base no vetor pieces
     for(let i = 0; i < 8; i++)
     {
+        //posiciona as pecas da retaguarda
         board[i][7] = (i < 3) ? (4 - i) : (i - 3)
         board[i][0] = (i < 3) ? (10 - i) : (i + 3)
 
+        //posiciona os peoes
         board[i][6] = 5
         board[i][1] = 11
     }
@@ -66,12 +74,14 @@ function createPieces()
 
 function drawBoard()
 {
+    //limpa o canvas para nao haver sobreposicoes
     render.clearRect(0, 0, canvas.width, canvas.height)
 
     let white
     
     for(let i = 0; i < 8; i++)
     {
+        //garante que as linhas sempre comecem alternando as cores
         white = i % 2 === 0
 
         for(let j = 0; j < 8; j++)
@@ -82,7 +92,7 @@ function drawBoard()
             white = !white
         }
     }
-
+    
     drawPieces()
 }
 
@@ -92,8 +102,10 @@ function drawPieces()
     {
         for(let j = 0; j < 8; j++)
         {
+            //caso a posicao (i, j) no tabuleiro nao esteja vazia
             if(board[i][j] !== undefined)
             {
+                //desenha a peca pegando as informacoes do vetor pieces
                 render.drawImage
                 (
                     pieces_img, pieces[ board[i][j] ].xImg, pieces[ board[i][j] ].yImg, 200, 200,
@@ -107,11 +119,13 @@ function drawPieces()
 //input do jogador
 function movePiece(mouseX, mouseY)
 {
+    //caso nenhuma peca tenha sido selecionada anteriormente
     if(selected.length === 0)
     {
         let x = Math.floor(mouseX / tileSize)
         let y = Math.floor(mouseY / tileSize)
     
+        //salva a posicao selecionada caso contenha uma peca
         if(board[x][y] !== undefined) selected = [x, y]
     }
     
@@ -119,18 +133,23 @@ function movePiece(mouseX, mouseY)
     {
         let x = Math.floor(mouseX / tileSize)
         let y = Math.floor(mouseY / tileSize)
-    
+
+        //caso a posicao esteja vazia
         if(board[x][y] === undefined)
         {
+            //troca a posicao da peca para a nova posicao selecionada
             board[x][y] = board[ selected[0] ][ selected[1] ]
             board[ selected[0] ][ selected[1] ] = undefined
+
             drawBoard()
         }
 
+        //tira a selecao
         selected.length = 0
     }
 }
 
+//procura os movimentos validos
 function kingMovement(index)
 {
     let tiles = {}
