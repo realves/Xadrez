@@ -86,34 +86,22 @@ function drawBoard()
 
         for(let j = 0; j < 8; j++)
         {
+            //desenha as casas do tabuleiro
             render.fillStyle = white ? "#a68b67" : "#534437"
             render.fillRect(i * tileSize, j * tileSize, tileSize, tileSize)
 
             white = !white
+
+            //caso a posicao (i, j) no tabuleiro nao esteja vazia
+            if(board[i][j] !== undefined) drawPiece(pieces[ board[i][j] ], i * tileSize, j * tileSize)
         }
     }
-    
-    drawPieces()
 }
 
-function drawPieces()
+function drawPiece(piece, x, y)
 {
-    for(let i = 0; i < 8; i++)
-    {
-        for(let j = 0; j < 8; j++)
-        {
-            //caso a posicao (i, j) no tabuleiro nao esteja vazia
-            if(board[i][j] !== undefined)
-            {
-                //desenha a peca pegando as informacoes do vetor pieces
-                render.drawImage
-                (
-                    pieces_img, pieces[ board[i][j] ].xImg, pieces[ board[i][j] ].yImg, 200, 200,
-                    i * tileSize, j * tileSize, tileSize, tileSize
-                )
-            }
-        }
-    }
+    //desenha a peca pegando as informacoes do vetor pieces
+    render.drawImage(pieces_img, piece.xImg, piece.yImg, 200, 200, x, y, tileSize, tileSize)
 }
 
 //input do jogador
@@ -125,8 +113,13 @@ function movePiece(mouseX, mouseY)
         let x = Math.floor(mouseX / tileSize)
         let y = Math.floor(mouseY / tileSize)
     
-        //salva a posicao selecionada caso contenha uma peca
-        if(board[x][y] !== undefined) selected = [x, y]
+        if(board[x][y] !== undefined)
+        {
+            //salva a posicao selecionada
+            selected = [x, y]
+            //procura os movimentos possiveis
+            pieces[ board[x][y] ].movement(x, y)
+        }
     }
     
     else
@@ -140,9 +133,9 @@ function movePiece(mouseX, mouseY)
             //troca a posicao da peca para a nova posicao selecionada
             board[x][y] = board[ selected[0] ][ selected[1] ]
             board[ selected[0] ][ selected[1] ] = undefined
-
-            drawBoard()
         }
+
+        drawBoard()
 
         //tira a selecao
         selected.length = 0
@@ -150,25 +143,17 @@ function movePiece(mouseX, mouseY)
 }
 
 //procura os movimentos validos
-function kingMovement(index)
+function kingMovement()
 {
-    let tiles = {}
-
-    for(let i = 0; i < 3; i++)
-    {
-        for(let j = 0; j < 3; j++)
-        {
-            //if()
-        }
-    }
+    
 }
 
-function queenMovement(index)
+function queenMovement()
 {
 
 }
 
-function bishopMovement(index)
+function bishopMovement()
 {
 
 }
@@ -181,12 +166,22 @@ function knightMovement(index)
     )
 }
 
-function rookMovement(index)
+function rookMovement()
 {
 
 }
 
-function pawnMovement(index)
+function pawnMovement(x, y)
 {
-    console.log(whites[index].x, whites[index].y -1)
+    drawMovement(x, y - 1)
+    drawMovement(x, y - 2)
+}
+
+//desenha os movimentos validos
+function drawMovement(x, y)
+{
+    render.beginPath()
+    render.arc(x * tileSize + tileSize / 2, y * tileSize + tileSize / 2, tileSize * .15, 0, 2 * Math.PI)
+    render.fillStyle = "#fffc"
+    render.fill()
 }
