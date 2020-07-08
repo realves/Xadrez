@@ -1,4 +1,4 @@
-let canvas, render, pieces_img, tileSize, board = [], selected, moves = [], captures = []
+let canvas, render, pieces_img, tileSize, board = [], selected, moves = [], captures = [], windowSize
 
 let pieces = 
 [
@@ -17,15 +17,14 @@ let pieces =
     { name: "b_pawn", xImg: 1000, yImg: 200, movement: pawnMovement },
 ]
 
-const fps = 1000/30
-
 //configuracao inicial do jogo
 window.onload = function()
 {
     canvas = document.getElementById("mycanvas")
     render = canvas.getContext("2d")
-    canvas.width = 640
-    canvas.height = 640
+    windowSize = window.innerHeight > window.innerWidth ? window.innerWidth : window.innerHeight
+    canvas.width = windowSize * .9
+    canvas.height = windowSize * .9
     
     tileSize = canvas.width / 8
     
@@ -51,6 +50,24 @@ function initGame()
         let mouseY = event.clientY - canvas.offsetTop
         if(mouseX > 0 && mouseX < canvas.width && mouseY > 0 && mouseY < canvas.height) movePiece(mouseX, mouseY)
     })
+
+    setInterval(canvasSize, 1000)
+}
+
+function canvasSize()
+{
+    let newSize = window.innerHeight > window.innerWidth ? window.innerWidth : window.innerHeight
+    if(newSize !== windowSize)
+    {
+        windowSize = newSize
+
+        canvas.width = windowSize * .9
+        canvas.height = windowSize * .9
+    
+        tileSize = canvas.width / 8
+
+        drawBoard()
+    }
 }
 
 //configuracao do tabuleiro
@@ -90,7 +107,7 @@ function drawBoard()
         for(let j = 0; j < 8; j++)
         {
             //desenha as casas do tabuleiro
-            render.fillStyle = white ? "#a68b67" : "#534437"
+            render.fillStyle = white ? "#a68b67" : "#5f5043"
             render.fillRect(i * tileSize, j * tileSize, tileSize, tileSize)
 
             white = !white
