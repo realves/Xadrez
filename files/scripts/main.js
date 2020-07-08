@@ -22,6 +22,8 @@ window.onload = function()
 {
     canvas = document.getElementById("mycanvas")
     render = canvas.getContext("2d")
+
+    //garante que o canvas caiba na janela
     windowSize = window.innerHeight > window.innerWidth ? window.innerWidth : window.innerHeight
     canvas.width = windowSize * .9
     canvas.height = windowSize * .9
@@ -34,6 +36,7 @@ window.onload = function()
     pieces_img.onload = initGame
 }
 
+//inicia o jogo
 function initGame()
 {
     //reseta as variaveis
@@ -54,6 +57,7 @@ function initGame()
     setInterval(canvasSize, 1000)
 }
 
+//garante que o tamanho do canvas se adapte a janela
 function canvasSize()
 {
     let newSize = window.innerHeight > window.innerWidth ? window.innerWidth : window.innerHeight
@@ -157,7 +161,7 @@ function movePiece(mouseX, mouseY)
 
         drawBoard()
 
-        //tira a selecao
+        //remove a selecao
         selected = -1
         moves.length = 0
         captures.length = 0
@@ -208,7 +212,65 @@ function knightMovement()
 
 function rookMovement(x, y)
 {
-    horizontalMovement(x, y)
+    let j
+    let blocked
+
+    //casas no eixo x
+    for(let i = -1; i <= 1; i += 2)
+    {
+        //primeira iteracao = casas a esquerda
+        //segunda iteracao = casas a direita
+
+        j = i
+        blocked = false
+
+        //caso a casa esteja dentro do tabuleiro
+        while(x + j >= 0 && x + j <= 7 && !blocked)
+        {
+            let pos = (x + j) + y * 8
+
+            //caso a casa esteja vazia, o movimento e valido
+            if(board[pos] === undefined) moves.push(pos)
+
+            else
+            {
+                blocked = true
+
+                //caso a peca seja de outra cor, a captura e valida
+                if(pieces[ board[selected] ].yImg === 0 && pieces[ board[pos] ].yImg === 200
+                    || pieces[ board[selected] ].yImg === 200 && pieces[ board[pos] ].yImg === 0) captures.push(pos)
+            }
+
+            j += i
+        }
+    }
+
+    //casas no eixo y, mesmo procedimento acima
+    for(let i = -1; i <= 1; i += 2)
+    {
+        //primeira iteracao = casas acima
+        //segunda iteracao = casas abaixo
+
+        j = i
+        blocked = false
+
+        while(y + j >= 0 && y + j <= 7 && !blocked)
+        {
+            let pos = x + (y + j) * 8
+
+            if(board[pos] === undefined) moves.push(pos)
+
+            else
+            {
+                blocked = true
+
+                if(pieces[ board[selected] ].yImg === 0 && pieces[ board[pos] ].yImg === 200
+                    || pieces[ board[selected] ].yImg === 200 && pieces[ board[pos] ].yImg === 0) captures.push(pos)
+            }
+
+            j += i
+        }
+    }
 
     if(moves.length > 0 || captures.length > 0) drawMovement()
     else selected = -1
@@ -242,7 +304,7 @@ function pawnMovement(x, y)
             }
         }
     }
-    //peao preto
+    //peao preto, mesmos procedimentos acima
     else
     {
         if(y + 1 <= 7)
@@ -269,90 +331,16 @@ function pawnMovement(x, y)
     else selected = -1
 }
 
-function horizontalMovement(x, y)
-{
-    let i = 1
-    let blocked = false
-    while(x - i >= 0 && !blocked)
-    {
-        let pos = (x - i) + y * 8
-        if(board[pos] === undefined) moves.push(pos)
-
-        else
-        {
-            blocked = true
-
-            if(pieces[ board[selected] ].yImg === 0 && pieces[ board[pos] ].yImg === 200
-                || pieces[ board[selected] ].yImg === 200 && pieces[ board[pos] ].yImg === 0) captures.push(pos)
-        }
-
-        i++
-    }
-
-    i = 1
-    blocked = false
-    while(x + i <= 7 && !blocked)
-    {
-        let pos = (x + i) + y * 8
-        if(board[pos] === undefined) moves.push(pos)
-
-        else
-        {
-            blocked = true
-
-            if(pieces[ board[selected] ].yImg === 0 && pieces[ board[pos] ].yImg === 200
-            || pieces[ board[selected] ].yImg === 200 && pieces[ board[pos] ].yImg === 0) captures.push(pos)
-        }
-        i++
-    }
-
-    i = 1
-    blocked = false
-    while(y - i >= 0 && !blocked)
-    {
-        let pos = x + (y - i) * 8
-        if(board[pos] === undefined) moves.push(pos)
-
-        else
-        {
-            blocked = true
-
-            if(pieces[ board[selected] ].yImg === 0 && pieces[ board[pos] ].yImg === 200
-            || pieces[ board[selected] ].yImg === 200 && pieces[ board[pos] ].yImg === 0) captures.push(pos)
-        }
-        i++
-    }
-
-    i = 1
-    blocked = false
-    while(y + i <= 7 && !blocked)
-    {
-        let pos = x + (y + i) * 8
-
-        if(board[pos] === undefined) moves.push(pos)
-
-        else
-        {
-            blocked = true
-
-            if(pieces[ board[selected] ].yImg === 0 && pieces[ board[pos] ].yImg === 200
-            || pieces[ board[selected] ].yImg === 200 && pieces[ board[pos] ].yImg === 0) captures.push(pos)
-        }
-        i++
-    }
-}
-
-//desenha os movimentos validos
 function drawMovement()
 {
-    //mostra as possiveis capturas
+    //mostra as capturas possiveis
     render.strokeStyle = "#a00c"
 
     captures.forEach(pos => {
         render.strokeRect(pos % 8 * tileSize, Math.floor(pos / 8) * tileSize, tileSize, tileSize)
     });
 
-    //mostra as casas disponiveis para se mover
+    //mostra os movimentos possiveis
     render.fillStyle = "#000c"
 
     moves.forEach(pos => {
