@@ -1,4 +1,4 @@
-let canvas, render, pieces_img, tileSize, board, selected = []
+let canvas, render, pieces_img, tileSize, board = [], selected, moves = [], captures = []
 
 let pieces = 
 [
@@ -37,8 +37,11 @@ window.onload = function()
 
 function initGame()
 {
-    //garante que nenhuma peca esteja selecionada no comeco da partida
-    selected.length = 0
+    //reseta as variaveis
+    selected = -1
+    board.length = 0
+    moves.length = 0
+    captures.length = 0
     
     configBoard()
     drawBoard()
@@ -53,22 +56,22 @@ function initGame()
 //configuracao do tabuleiro
 function configBoard()
 {
-    //cria as linhas e colunas do tabuleiro
-    board = []
-    for(let i = 0; i < 8; i++) board[i] = new Array(8)
+    //cria o vetor do tabuleiro
+    board.length = 64
 
     //board armazena um numero entre 0 e 11 que determina
     //o tipo da peca que esta contida na posicao (x, y)
     //com base no vetor pieces
+    //sendo x = index % 8, y = index / 8, index = x + y * 8
     for(let i = 0; i < 8; i++)
     {
         //posiciona as pecas da retaguarda
-        board[i][7] = (i < 3) ? (4 - i) : (i - 3)
-        board[i][0] = (i < 3) ? (10 - i) : (i + 3)
+        board[i + 7 * 8] = (i < 3) ? (4 - i) : (i - 3)
+        board[i] = (i < 3) ? (10 - i) : (i + 3)
 
         //posiciona os peoes
-        board[i][6] = 5
-        board[i][1] = 11
+        board[i + 6 * 8] = 5
+        board[i + 8] = 11
     }
 }
 
@@ -93,7 +96,7 @@ function drawBoard()
             white = !white
 
             //caso a posicao (i, j) no tabuleiro nao esteja vazia
-            if(board[i][j] !== undefined) drawPiece(pieces[ board[i][j] ], i * tileSize, j * tileSize)
+            if(board[i + j * 8] !== undefined) drawPiece(pieces[ board[i + j * 8] ], i * tileSize, j * tileSize)
         }
     }
 }
@@ -108,17 +111,17 @@ function drawPiece(piece, x, y)
 function movePiece(mouseX, mouseY)
 {
     //caso nenhuma peca tenha sido selecionada anteriormente
-    if(selected.length === 0)
+    if(selected === -1)
     {
         let x = Math.floor(mouseX / tileSize)
         let y = Math.floor(mouseY / tileSize)
     
-        if(board[x][y] !== undefined)
+        if(board[x + y * 8] !== undefined)
         {
             //salva a posicao selecionada
-            selected = [x, y]
+            selected = x + y * 8
             //procura os movimentos possiveis
-            pieces[ board[x][y] ].movement(x, y)
+            pieces[ board[selected] ].movement(x, y)
         }
     }
     
@@ -128,17 +131,19 @@ function movePiece(mouseX, mouseY)
         let y = Math.floor(mouseY / tileSize)
 
         //caso a posicao esteja vazia
-        if(board[x][y] === undefined)
+        if(moves.includes(x + y * 8) || captures.includes(x + y * 8))
         {
             //troca a posicao da peca para a nova posicao selecionada
-            board[x][y] = board[ selected[0] ][ selected[1] ]
-            board[ selected[0] ][ selected[1] ] = undefined
+            board[x + y * 8] = board[selected]
+            board[selected] = undefined
         }
 
         drawBoard()
 
         //tira a selecao
-        selected.length = 0
+        selected = -1
+        moves.length = 0
+        captures.length = 0
     }
 }
 
@@ -160,10 +165,7 @@ function bishopMovement()
 
 function knightMovement(index)
 {
-    console.log(
-        whites[index].x + 1, whites[index].y - 2,
-        whites[index].x - 1, whites[index].y - 2
-    )
+    
 }
 
 function rookMovement()
@@ -173,15 +175,83 @@ function rookMovement()
 
 function pawnMovement(x, y)
 {
-    drawMovement(x, y - 1)
-    drawMovement(x, y - 2)
+    //peao branco
+    if(pieces[ board[selected] ].yImg === 0)
+    {
+        //caso haja alguma casa acima
+        if(y - 1 >= 0)
+        {
+            //checa os movimentos possiveis
+            if(board[ x + (y - 1) * 8 ] === undefined)
+            {
+                moves.push(x + (y - 1) * 8)
+    
+                //caso seja o primeiro movimento, checa se a segunda casa acima esta vazia
+                if(y === 6 && board[ x + (y - 2) * 8 ] === undefined) moves.push(x + (y - 2) * 8)
+            }
+
+            //checa as capturas possiveis
+            if(x - 1 >= 0 && board[ (x - 1) + (y - 1) * 8] !== undefined && pieces[board[ (x - 1) + (y - 1) * 8]].yImg === 200)
+            {
+                captures.push((x - 1) + (y - 1) * 8)
+            }
+            if(x + 1 <= 7 && board[ (x + 1) + (y - 1) * 8] !== undefined && pieces[board[ (x + 1) + (y - 1) * 8]].yImg === 200)
+            {
+                captures.push((x + 1) + (y - 1) * 8)
+            }
+        }
+    }
+    //peao preto
+    else
+    {
+        if(y + 1 <= 7)
+        {
+            if(board[ x + (y + 1) * 8 ] === undefined)
+            {
+                moves.push(x + (y + 1) * 8)
+
+                if(y === 1 && board[ x + (y + 2) * 8 ] === undefined) moves.push(x + (y + 2) * 8)
+            }
+
+            if(x - 1 >= 0 && board[ (x - 1) + (y + 1) * 8] !== undefined && pieces[board[ (x - 1) + (y + 1) * 8]].yImg === 0)
+            {
+                captures.push((x - 1) + (y + 1) * 8)
+            }
+            if(x + 1 <= 7 && board[ (x + 1) + (y + 1) * 8] !== undefined && pieces[board[ (x + 1) + (y + 1) * 8]].yImg === 0)
+            {
+                captures.push((x + 1) + (y + 1) * 8)
+            }
+        }
+    }
+
+    if(moves.length > 0 || captures.length > 0) drawMovement()
+    else selected = -1
 }
 
 //desenha os movimentos validos
-function drawMovement(x, y)
+function drawMovement()
 {
-    render.beginPath()
-    render.arc(x * tileSize + tileSize / 2, y * tileSize + tileSize / 2, tileSize * .15, 0, 2 * Math.PI)
-    render.fillStyle = "#fffc"
-    render.fill()
+    //destaca a peca selecionada
+    render.strokeStyle = "#000c"
+    render.lineWidth = 2
+    render.strokeRect(selected % 8 * tileSize, Math.floor(selected / 8) * tileSize, tileSize, tileSize)
+
+    //mostra as casas disponiveis para se mover
+    render.fillStyle = "#000c"
+
+    moves.forEach(pos => {
+        let x = pos % 8 * tileSize + tileSize / 2
+        let y = Math.floor(pos / 8) * tileSize + tileSize / 2
+
+        render.beginPath()
+        render.arc(x, y, tileSize * .15, 0, 2 * Math.PI)
+        render.fill()
+    })
+
+    //mostra as possiveis capturas
+    render.strokeStyle = "#a00c"
+
+    captures.forEach(pos => {
+        render.strokeRect(pos % 8 * tileSize, Math.floor(pos / 8) * tileSize, tileSize, tileSize)
+    });
 }
