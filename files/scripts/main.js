@@ -200,9 +200,46 @@ function queenMovement()
 
 }
 
-function bishopMovement()
+function bishopMovement(x, y)
 {
+    let k, l, blocked
 
+    for(let i = -1; i <= 1; i += 2)
+    {
+        for(let j = -1; j <= 1; j += 2)
+        {
+            //ordem das iteracoes: diagonais supeior esquerda,
+            //inferior esquerda, superior direita, inferior direita
+
+            k = i
+            l = j
+            blocked = false
+
+            //caso a casa esteja dentro do tabuleiro
+            while(x + k >= 0 && x + k <= 7 && y + l >= 0 && y + l <= 7 && !blocked)
+            {
+                let pos = (x + k) + (y + l) * 8
+
+                //caso a casa esteja vazia, o movimento e valido
+                if(board[pos] === undefined) moves.push(pos)
+    
+                else
+                {
+                    blocked = true
+    
+                    //caso a peca seja de outra cor, a captura e valida
+                    if(pieces[ board[selected] ].yImg === 0 && pieces[ board[pos] ].yImg === 200
+                        || pieces[ board[selected] ].yImg === 200 && pieces[ board[pos] ].yImg === 0) captures.push(pos)
+                }
+
+                k += i
+                l += j
+            }
+        }
+    }
+
+    if(moves.length > 0 || captures.length > 0) drawMovement()
+    else selected = -1
 }
 
 function knightMovement()
@@ -212,15 +249,13 @@ function knightMovement()
 
 function rookMovement(x, y)
 {
-    let j
-    let blocked
+    let j, blocked
 
-    //casas no eixo x
     for(let i = -1; i <= 1; i += 2)
     {
+        //casas no eixo x
         //primeira iteracao = casas a esquerda
         //segunda iteracao = casas a direita
-
         j = i
         blocked = false
 
@@ -243,14 +278,10 @@ function rookMovement(x, y)
 
             j += i
         }
-    }
 
-    //casas no eixo y, mesmo procedimento acima
-    for(let i = -1; i <= 1; i += 2)
-    {
+        //casas no eixo y, mesmo procedimento acima
         //primeira iteracao = casas acima
         //segunda iteracao = casas abaixo
-
         j = i
         blocked = false
 
