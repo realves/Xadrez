@@ -168,7 +168,7 @@ function movePiece(mouseX, mouseY)
     }
 }
 
-//procura os movimentos validos
+//movimento das pecas
 function kingMovement(x, y)
 {
     //para as casas no eixo x
@@ -195,48 +195,18 @@ function kingMovement(x, y)
     else selected = -1
 }
 
-function queenMovement()
+function queenMovement(x, y)
 {
+    diagMovement(x, y)
+    vertHorMovement(x, y)
 
+    if(moves.length > 0 || captures.length > 0) drawMovement()
+    else selected = -1
 }
 
 function bishopMovement(x, y)
 {
-    let k, l, blocked
-
-    for(let i = -1; i <= 1; i += 2)
-    {
-        for(let j = -1; j <= 1; j += 2)
-        {
-            //ordem das iteracoes: diagonais supeior esquerda,
-            //inferior esquerda, superior direita, inferior direita
-
-            k = i
-            l = j
-            blocked = false
-
-            //caso a casa esteja dentro do tabuleiro
-            while(x + k >= 0 && x + k <= 7 && y + l >= 0 && y + l <= 7 && !blocked)
-            {
-                let pos = (x + k) + (y + l) * 8
-
-                //caso a casa esteja vazia, o movimento e valido
-                if(board[pos] === undefined) moves.push(pos)
-    
-                else
-                {
-                    blocked = true
-    
-                    //caso a peca seja de outra cor, a captura e valida
-                    if(pieces[ board[selected] ].yImg === 0 && pieces[ board[pos] ].yImg === 200
-                        || pieces[ board[selected] ].yImg === 200 && pieces[ board[pos] ].yImg === 0) captures.push(pos)
-                }
-
-                k += i
-                l += j
-            }
-        }
-    }
+    diagMovement(x, y)
 
     if(moves.length > 0 || captures.length > 0) drawMovement()
     else selected = -1
@@ -249,59 +219,7 @@ function knightMovement()
 
 function rookMovement(x, y)
 {
-    let j, blocked
-
-    for(let i = -1; i <= 1; i += 2)
-    {
-        //casas no eixo x
-        //primeira iteracao = casas a esquerda
-        //segunda iteracao = casas a direita
-        j = i
-        blocked = false
-
-        //caso a casa esteja dentro do tabuleiro
-        while(x + j >= 0 && x + j <= 7 && !blocked)
-        {
-            let pos = (x + j) + y * 8
-
-            //caso a casa esteja vazia, o movimento e valido
-            if(board[pos] === undefined) moves.push(pos)
-
-            else
-            {
-                blocked = true
-
-                //caso a peca seja de outra cor, a captura e valida
-                if(pieces[ board[selected] ].yImg === 0 && pieces[ board[pos] ].yImg === 200
-                    || pieces[ board[selected] ].yImg === 200 && pieces[ board[pos] ].yImg === 0) captures.push(pos)
-            }
-
-            j += i
-        }
-
-        //casas no eixo y, mesmo procedimento acima
-        //primeira iteracao = casas acima
-        //segunda iteracao = casas abaixo
-        j = i
-        blocked = false
-
-        while(y + j >= 0 && y + j <= 7 && !blocked)
-        {
-            let pos = x + (y + j) * 8
-
-            if(board[pos] === undefined) moves.push(pos)
-
-            else
-            {
-                blocked = true
-
-                if(pieces[ board[selected] ].yImg === 0 && pieces[ board[pos] ].yImg === 200
-                    || pieces[ board[selected] ].yImg === 200 && pieces[ board[pos] ].yImg === 0) captures.push(pos)
-            }
-
-            j += i
-        }
-    }
+    vertHorMovement(x, y)
 
     if(moves.length > 0 || captures.length > 0) drawMovement()
     else selected = -1
@@ -387,4 +305,102 @@ function drawMovement()
     render.strokeStyle = "#000c"
     render.lineWidth = 2
     render.strokeRect(selected % 8 * tileSize, Math.floor(selected / 8) * tileSize, tileSize, tileSize)
+}
+
+//movimento diagonal
+function diagMovement(x, y)
+{
+    let k, l, blocked
+
+    for(let i = -1; i <= 1; i += 2)
+    {
+        for(let j = -1; j <= 1; j += 2)
+        {
+            //ordem das iteracoes: diagonais supeior esquerda,
+            //inferior esquerda, superior direita, inferior direita
+
+            k = i
+            l = j
+            blocked = false
+
+            //caso a casa esteja dentro do tabuleiro
+            while(x + k >= 0 && x + k <= 7 && y + l >= 0 && y + l <= 7 && !blocked)
+            {
+                let pos = (x + k) + (y + l) * 8
+
+                //caso a casa esteja vazia, o movimento e valido
+                if(board[pos] === undefined) moves.push(pos)
+    
+                else
+                {
+                    blocked = true
+    
+                    //caso a peca seja de outra cor, a captura e valida
+                    if(pieces[ board[selected] ].yImg === 0 && pieces[ board[pos] ].yImg === 200
+                        || pieces[ board[selected] ].yImg === 200 && pieces[ board[pos] ].yImg === 0) captures.push(pos)
+                }
+
+                k += i
+                l += j
+            }
+        }
+    }
+}
+
+//movimento vertical e horizontal
+function vertHorMovement(x, y)
+{
+    let j, blocked
+
+    for(let i = -1; i <= 1; i += 2)
+    {
+        //casas no eixo x
+        //primeira iteracao = casas a esquerda
+        //segunda iteracao = casas a direita
+        j = i
+        blocked = false
+
+        //caso a casa esteja dentro do tabuleiro
+        while(x + j >= 0 && x + j <= 7 && !blocked)
+        {
+            let pos = (x + j) + y * 8
+
+            //caso a casa esteja vazia, o movimento e valido
+            if(board[pos] === undefined) moves.push(pos)
+
+            else
+            {
+                blocked = true
+
+                //caso a peca seja de outra cor, a captura e valida
+                if(pieces[ board[selected] ].yImg === 0 && pieces[ board[pos] ].yImg === 200
+                    || pieces[ board[selected] ].yImg === 200 && pieces[ board[pos] ].yImg === 0) captures.push(pos)
+            }
+
+            j += i
+        }
+
+        //casas no eixo y, mesmo procedimento acima
+        //primeira iteracao = casas acima
+        //segunda iteracao = casas abaixo
+        j = i
+        blocked = false
+
+        while(y + j >= 0 && y + j <= 7 && !blocked)
+        {
+            let pos = x + (y + j) * 8
+
+            if(board[pos] === undefined) moves.push(pos)
+
+            else
+            {
+                blocked = true
+
+                if(pieces[ board[selected] ].yImg === 0 && pieces[ board[pos] ].yImg === 200
+                    || pieces[ board[selected] ].yImg === 200 && pieces[ board[pos] ].yImg === 0) captures.push(pos)
+            }
+
+            j += i
+        }
+    }
 }
