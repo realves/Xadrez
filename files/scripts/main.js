@@ -1,4 +1,4 @@
-let canvas, render, pieces_img, tileSize, board = [], selected, moves = [], captures = [], windowSize
+let canvas, render, pieces_img, tileSize, board = [], selected, moves = [], captures = [], windowSize, turn
 
 let pieces = 
 [
@@ -44,6 +44,8 @@ function initGame()
     board.length = 0
     moves.length = 0
     captures.length = 0
+    //0 = turno das brancas, 200 = turno das pretas
+    turn = 0
     
     configBoard()
     drawBoard()
@@ -141,8 +143,11 @@ function movePiece(mouseX, mouseY)
         {
             //salva a posicao selecionada
             selected = x + y * 8
-            //procura os movimentos possiveis
-            pieces[ board[selected] ].movement(x, y)
+
+            //caso a cor da peca selecionada seja a mesma do turno, procura os movimentos possiveis
+            if(pieces[ board[selected] ].yImg === turn) pieces[ board[selected] ].movement(x, y)
+
+            else selected = -1
         }
     }
     
@@ -157,6 +162,9 @@ function movePiece(mouseX, mouseY)
             //troca a posicao da peca para a nova posicao selecionada
             board[x + y * 8] = board[selected]
             board[selected] = undefined
+
+            //troca o turno
+            turn = turn === 0 ? 200 : 0
         }
 
         drawBoard()
