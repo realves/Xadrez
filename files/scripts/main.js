@@ -212,9 +212,56 @@ function bishopMovement(x, y)
     else selected = -1
 }
 
-function knightMovement()
+function knightMovement(x, y)
 {
-    
+    for(let i = -2; i <= 2; i += 4)
+    {
+        //primeira iteracao = (x-2, y-1), (x-2, y+1)
+        //segunda iteracao = (x+2, y+1), (x+2, y-1)
+        let j = i / 2
+        do
+        {
+            //caso esteja dentro do tabuleiro
+            if(x + i >= 0 && x + i <= 7 && y + j >= 0 && y + j <= 7)
+            {
+                let pos = (x + i) + (y + j) * 8
+                //checa se o movimento e possivel
+                if(board[pos] === undefined) moves.push(pos)
+                
+                //checa se a captura e possivel
+                else if(pieces[ board[selected] ].yImg === 0 && pieces[ board[pos] ].yImg === 200
+                    || pieces[ board[selected] ].yImg === 200 && pieces[ board[pos] ].yImg === 0) captures.push(pos)
+            }
+
+            j -= i
+        } while(j !== -6 / i)
+    }
+
+    for(let i = -1; i <= 1; i += 2)
+    {
+        //primeira iteracao = (x-1, y+2), (x-1, y-2)
+        //segunda iteracao = (x+1, y-2), (x+1, y+2)
+        let j = i * 2
+        do
+        {
+            //caso esteja dentro do tabuleiro
+            if(x + i >= 0 && x + i <= 7 && y + j >= 0 && y + j <= 7)
+            {
+                let pos = (x + i) + (y + j) * 8
+                //checa se o movimento e possivel
+                if(board[pos] === undefined) moves.push(pos)
+                
+                //checa se a captura e possivel
+                else if(pieces[ board[selected] ].yImg === 0 && pieces[ board[pos] ].yImg === 200
+                    || pieces[ board[selected] ].yImg === 200 && pieces[ board[pos] ].yImg === 0) captures.push(pos)
+            }
+
+            j -= i * 4
+        } while(j !== -6 / i)
+    }
+
+    if(moves.length > 0 || captures.length > 0) drawMovement()
+    else selected = -1
 }
 
 function rookMovement(x, y)
